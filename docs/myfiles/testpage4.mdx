@@ -1,0 +1,32 @@
+---
+title: My testpage4
+sidebar_position: 4
+description: This is my testpage4!
+
+---
+
+### 这是我的测试页面4
+export const Highlight = ({children, color}) => (
+  <span
+    style={{
+      backgroundColor: color,
+      borderRadius: '20px',
+      color: '#fff',
+      padding: '10px',
+      cursor: 'pointer',
+    }}
+    onClick={() => {
+      alert(`You clicked the color ${color} with label ${children}`)
+    }}>
+    {children}
+  </span>
+);
+
+This is <Highlight color="#25c2a0">Docusaurus green</Highlight> !
+
+This is <Highlight color="#F2BBE0">Facebook Pink</Highlight> !
+<div className='flex gap-5' >
+  <a href="\blog" class="source_card_button" target="_blank">**📂 Blog**</a>
+</div>
+
+<div style={{ marginBottom: '20px' }}></div>
