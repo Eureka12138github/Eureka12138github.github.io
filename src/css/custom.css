@@ -6,25 +6,25 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-color-primary: #FFAEB9; /* 亮粉色，更适配暗背景 */
+  --ifm-color-primary-dark: #ff8fb8;
+  --ifm-color-primary-darker: #ff7aa3;
+  --ifm-color-primary-darkest: #cc5f82;
+  --ifm-color-primary-light: #ffb3d6;
+  --ifm-color-primary-lighter: #ffcce0;
+  --ifm-color-primary-lightest: #ffe6f0;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 38, 130, 0.2);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #87CEFA; /* 主色调：天蓝色 */
+  --ifm-color-primary-dark: #b9155f; /* 深粉红，用于 hover 状态 */
+  --ifm-color-primary-darker: #90114d; /* 更深的粉色，用于 active 状态 */
+  --ifm-color-primary-darkest: #690c36; /* 最深粉红，用于阴影或强调区域 */
+  --ifm-color-primary-light: #f02a84; /* 稍亮的粉色，用于高亮元素 */
+  --ifm-color-primary-lighter: #f94a9e; /* 更亮的粉色，适合按钮背景 */
+  --ifm-color-primary-lightest: #ffc0e0; /* 浅粉色，适合背景或提示区域 */
+  --ifm-code-font-size: 95%; /* 代码字体大小保持一致 */
+  --docusaurus-highlighted-code-line-bg: rgba(232, 26, 115, 0.1); /* 高亮行背景色 */
 }

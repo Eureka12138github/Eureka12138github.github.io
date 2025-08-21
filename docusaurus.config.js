@@ -10,9 +10,9 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
-  favicon: 'img/favicon.ico',
+  title: '我的网站',
+  tagline: '这是我的个人网站',
+  favicon: 'img/Eureka.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -52,7 +52,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/master',
+            'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/main',
 			 showLastUpdateTime: true,
 		     showLastUpdateAuthor: true // 显示作者
         },
@@ -65,11 +65,12 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/master',
+            'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/main',
           // Useful options to enforce blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
+		  showLastUpdateTime: true,
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -82,23 +83,23 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/My-temp-social-card.jpg',
       navbar: {
-        title: 'My Site',
+        title: '我的网站',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: '我的网站LOGO',
+          src: 'img/Eureka.svg',
         },
         items: [
           {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: '记录',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: '/blog', label: '博客', position: 'left'},
           {
-            href: 'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/master',
+            href: 'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/main',
             label: 'GitHub',
             position: 'right',
           },
@@ -111,8 +112,8 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: '模板',
+                to: '/docs/mydoc/testpage0',
               },
             ],
           },
@@ -120,29 +121,23 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+                label: 'Gihub',
+                href: 'https://github.com/Eureka12138github/',
               },
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'X',
-                href: 'https://x.com/docusaurus',
-              },
+
+
             ],
           },
           {
             title: 'More',
             items: [
               {
-                label: 'Blog',
+                label: '博客',
                 to: '/blog',
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/master',
+                href: 'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/main',
               },
             ],
           },

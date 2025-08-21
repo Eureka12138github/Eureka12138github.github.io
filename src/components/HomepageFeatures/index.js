@@ -4,32 +4,29 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: '📖 关于我的博客',
+    Svg: require('@site/static/img/Sherry1.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+		欢迎来到我的博客！这里是我在技术学习过程中点滴积累的记录与思考。
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: '🔧 分享与总结',
+    Svg: require('@site/static/img/Sherry2.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+		在这里，我会整理学习过程中的思考与经验，记录遇到的问题与解决思路，希望能为他人或未来的自己提供一份清晰的技术沉淀。
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: '🌱 记录成长之路',
+    Svg: require('@site/static/img/Sherry3.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+		不出意外，这里将成为我技术成长的见证。从零开始，不断探索，每一步进步都会被记录下来，作为总结与前行的参考。
       </>
     ),
   },

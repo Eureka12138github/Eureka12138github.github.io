@@ -1,0 +1,375 @@
+/*************************************************************************************
+ * 功能：为一级标题添加动态装饰元素（左侧竖线 + 右下角图标）
+ * 实现方式：
+ *   - 使用伪元素 ::before 和 ::after 创建装饰线条和图标
+ *   - 鼠标悬停时出现动效（线条上移 + 图标放大）
+ *   - 支持亮暗模式切换，颜色通过 CSS 变量控制
+ * 命名说明：
+ *   - 使用 B1 而不是 H1 是为了避免与 HTML 标签冲突
+ *************************************************************************************/
+
+/* 主容器样式 */
+.B1 {
+  position: relative; /* 为伪元素提供定位参考点 */
+  padding-left: 1rem; /* 留出左侧空间给装饰线 */
+}
+
+/*---------------------------------------------
+  伪元素 ::before - 左侧装饰竖线
+------------------------------------------------*/
+.B1::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  bottom: 0em;
+  width: 6px;
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-b1),
+    rgba(255, 255, 255, 0.4)
+  );
+  border-radius: 4px;
+
+  /* 初始状态：从顶部缩放隐藏 */
+  transform: scaleY(0.6);
+  transform-origin: top center;
+  opacity: 0.8;
+
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+/*---------------------------------------------
+  伪元素 ::after - 右上角小图标或装饰点
+------------------------------------------------*/
+.B1::after {
+  content: '✦'; /* 使用 Unicode 图形符号作为装饰图标 */
+  position: absolute;
+  right: -0.7em;
+  bottom: 0.3em;
+  font-size: 1.2em;
+  color: var(--color-b1);
+  opacity: 0.6;
+
+  /* 初始状态：缩小透明 */
+  transform: scale(0.8);
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+/*---------------------------------------------
+  鼠标悬停效果：装饰线展开 + 图标浮现
+------------------------------------------------*/
+.B1:hover::before,
+.B1:hover::after {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/*---------------------------------------------
+  亮色模式专属样式
+  设置主色和图标背景渐变
+------------------------------------------------*/
+[data-theme="light"] .B1 {
+  --color-b1: #87CEFA; /* 蓝色主色 */
+}
+
+[data-theme="light"] .B1::before {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-b1),
+    rgba(255, 255, 255, 0.4)
+  );
+}
+
+[data-theme="light"] .B1::after {
+  text-shadow: 0 0 4px rgba(92, 98, 213, 0.4);
+}
+
+/*---------------------------------------------
+  暗色模式专属样式
+  更换装饰线条和图标颜色
+------------------------------------------------*/
+[data-theme="dark"] .B1 {
+  --color-b1: #F2BBE0; /* 暗色模式主色（粉色） */
+}
+
+[data-theme="dark"] .B1::before {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-b1),
+    rgba(0, 0, 0, 0.4)
+  );
+}
+
+[data-theme="dark"] .B1::after {
+  text-shadow: 0 0 4px rgba(25, 165, 88, 0.6);
+}
+/*************************************************************************************
+ * 功能：为二级标题添加动态装饰线条
+ * 实现方式：
+ *   - 使用伪元素 .B2::after 创建一条渐变横线
+ *   - 鼠标悬停时横线从短到长平滑拉伸，增强交互感
+ *   - 支持亮暗模式切换，颜色通过 CSS 变量控制
+ * 命名说明：
+ *   - 使用 B2 而不是 H2 是为了避免与原生 HTML 标签冲突
+ *************************************************************************************/
+/* 主容器样式 */
+.B2 {
+  position: relative; /* 为伪元素 ::after 提供绝对定位的参考点 */
+}
+
+/*---------------------------------------------
+  伪元素 ::after - 标题下方的渐变装饰线条
+------------------------------------------------*/
+.B2::after {
+  content: ''; /* 必须设置 content 才能显示伪元素 */
+
+  position: absolute; /* 相对于 .B2 定位 */
+  left: 0; /* 从左侧开始绘制 */
+  bottom: -0.2em; /* 线条位于文字下方一点，提升视觉舒适度 */
+
+  width: 40%; /* 初始宽度为标题宽度的 40%，hover 时拉伸 */
+  height: 6px; /* 线条高度 */
+
+  border-radius: 4px; /* 微圆角，让线条更柔和美观 */
+
+  transition: width 300ms ease; /* 拉伸动画：仅对宽度做缓动效果 */
+}
+
+/*---------------------------------------------
+  鼠标悬停效果：线条从短到长平滑拉伸
+------------------------------------------------*/
+.B2:hover::after {
+  width: 100%; /* 鼠标悬停时拉伸至完整宽度，增强交互感 */
+}
+
+/*---------------------------------------------
+  亮色模式专属样式
+  装饰线条颜色定义及渐变方向
+------------------------------------------------*/
+[data-theme="light"] .B2::after {
+  --color-b2: #87CEFA; /* 设置亮色模式主色（浅蓝色） */
+  background: linear-gradient(
+    90deg, /* 从左向右渐变 */
+    var(--color-b2), /* 主色 */
+    rgba(255, 255, 255, 0.5) /* 渐变为半透明白色，增加光泽感 */
+  );
+}
+
+/*---------------------------------------------
+  暗色模式专属样式
+  装饰线条颜色定义及渐变方向
+------------------------------------------------*/
+[data-theme="dark"] .B2::after {
+  --color-b2: #F2BBE0; /* 设置暗色模式主色（粉色） */
+  background: linear-gradient(
+    90deg, /* 从左向右渐变 */
+    var(--color-b2), /* 主色 */
+    rgba(0, 0, 0, 0.5) /* 渐变为半透明黑色，使线条更融合于背景 */
+  );
+}
+/* End of code */
+
+
+/*---------------------------------------------
+  组件名称：.B3
+  功能描述：为三级标题添加左侧装饰色块
+  使用场景：用于强调三级标题或重要文本内容
+  命名说明：避免与原生 HTML 标签 H3 冲突，故命名为 B3（Block Level 3）
+------------------------------------------------*/
+
+.B3 {
+  position: relative; /* 为伪元素提供定位参考点 */
+}
+
+/*---------------------------------------------
+  伪元素 ::before - 左侧渐变装饰块
+  支持悬停展开动画 + 渐变背景
+------------------------------------------------*/
+.B3::before {
+  content: ''; /* 必须设置 content 才能显示伪元素 */
+
+  display: inline-block; /* 与文字在同一行显示 */
+  vertical-align: middle; /* 垂直居中对齐 */
+
+  width: 25px; /* 初始宽度为 25 */
+  height: 1.5rem; /* 初始高度为 1.5 */
+  border-radius: 4px; /* 微圆角，让线条更柔和美观 */
+  max-width: 25px; /* 设置最大宽度，避免过大 */
+  max-height: 1.5rem; /* 设置最大高度，比原来更大一些 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 0.8rem; /* 与文字保持间距 */
+
+  /* 使用线性渐变作为背景色 */
+  background: linear-gradient(135deg, #87CEFA, rgba(255, 255, 255, 0.4));
+
+  /* 初始状态：从左上角缩放隐藏一部分 */
+  transform: scaleX(0.6) scaleY(0.6);
+  transform-origin: top left;
+
+  opacity: 0.8;
+
+  /* 动画过渡 */
+  transition: transform 400ms cubic-bezier(0.3, 1.5, 0.7, 1), 
+              width 400ms ease,
+              height 400ms ease;
+}
+
+/* 鼠标进入标题时：色块从左上展开并填充 */
+.B3:hover::before {
+  width: 25px; /* 宽度扩展到完整大小 */
+  height: 1.5rem; /* 高度也扩展到完整大小 */
+
+  transform: scaleX(1) scaleY(1); /* 从左上角展开 */
+  opacity: 1;
+}
+
+/*---------------------------------------------
+  黑暗模式专属样式
+  更换装饰色块的渐变背景色
+------------------------------------------------*/
+[data-theme="dark"] .B3::before {
+  background: linear-gradient(135deg, #F2BBE0, rgba(0, 0, 0, 0.3));
+}
+
+
+
+.BH3 {
+  display: inline-block; /* 支持内边距和宽度控制 */
+  padding: 0.25rem 0.6rem; /* 文字与边框之间留出空间 */
+  border-radius: 6px; /* 更柔和的圆角 */
+
+  /* 使用渐变背景增强层次感 */
+  background: linear-gradient(135deg, #87CEFA, rgba(255, 255, 255, 0.4));
+  color: #000; /* 默认亮色模式下文字颜色为黑色 */
+  font-weight: 600;
+
+  /* 添加轻微阴影，使文字块更突出 */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  /* 过渡动画：用于悬停效果 */
+  transition: all 300ms ease;
+}
+
+/* 鼠标悬停时：轻微放大 + 背景变化 */
+.BH3:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #87CEFA, rgba(255, 255, 255, 0.6));
+}
+
+/*---------------------------------------------
+  黑暗模式专属样式
+  更换背景色与文字颜色
+------------------------------------------------*/
+[data-theme="dark"] .BH3 {
+  background: linear-gradient(135deg, #F2BBE0, rgba(0, 0, 0, 0.3));
+  color: #fff; /* 暗色模式下文字颜色为白色 */
+}
+
+[data-theme="dark"] .BH3:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #F2BBE0, rgba(0, 0, 0, 0.5));
+}
+
+
+
+/*---------------------------------------------
+  组件名称：.InlineHighlight
+  功能描述：用于在正文中标记关键词并高亮显示
+  使用场景：文档、教程、技术文章中的术语标记
+------------------------------------------------*/
+
+.InlineHighlight {
+  display: inline-block; /* 更好控制间距 */
+  padding: 0.2rem 0.4rem; /* 增加一点内边距，视觉更舒适 */
+  color: var(--color-highlight-text, #5c62d5); /* 主文字色 */
+  background-color: var(--color-highlight-bg, rgba(230, 231, 249, 0.8)); /* 背景色 */
+  border-radius: 4px;
+
+  transition: background-color 200ms ease, transform 150ms ease;
+}
+
+.InlineHighlight:hover {
+  background-color: var(--color-highlight-bg-hover, rgba(230, 231, 249, 1));
+  transform: translateY(-1px); /* 微上浮，增强交互感 */
+}
+
+.Card {
+  border: 0px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 3px 6px 2px rgba(0, 0, 0, 0.1);
+  background: white;
+
+  /* Flex 布局：垂直居中、水平靠左 */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  /* 添加过渡动画 */
+  transition: all 0.3s ease;
+}
+
+/* 悬停效果 */
+.Card:hover {
+  transform: translateY(-4px); /* 向上移动一点 */
+  box-shadow: 0 6px 12px 4px rgba(0, 0, 0, 0.15); /* 阴影变大 */
+  background-color: #f9f9f9; /* 背景色变浅 */
+}
+
+/* MyCss.module.css */
+
+/* 基础按钮样式 */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  white-space: nowrap;
+
+  /* 新增：防止压缩 */
+  flex-shrink: 0;
+}
+
+/* 按钮悬停效果（可选） */
+.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 禁用状态样式 */
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: auto; /* 兼容性处理 */
+}
+
+/* 图标容器 */
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
+}
+
+/* 加载动画图标 */
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+/* 加载旋转动画 */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
