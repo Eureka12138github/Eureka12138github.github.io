@@ -4,10 +4,19 @@
         <title>我的网站 Blog</title>
         <link>https://eureka12138github.github.io/blog</link>
         <description>我的网站 Blog</description>
-        <lastBuildDate>Thu, 21 Aug 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 22 Aug 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh-Hans</language>
+        <item>
+            <title><![CDATA[测试博客]]></title>
+            <link>https://eureka12138github.github.io/blog/testblog</link>
+            <guid>https://eureka12138github.github.io/blog/testblog</guid>
+            <pubDate>Fri, 22 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[我的分身]]></description>
+            <content:encoded><![CDATA[<p><a href="https://www.eurekashadow.xin/" target="_blank" rel="noopener noreferrer" title="My Shadow">我的分身</a></p>]]></content:encoded>
+            <category>Recording</category>
+        </item>
         <item>
             <title><![CDATA[首个博客]]></title>
             <link>https://eureka12138github.github.io/blog/FirstBlog</link>
