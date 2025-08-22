@@ -82,6 +82,14 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+		// 添加 giscus 评论功能
+		giscus: {
+        repo: 'eureka12138github/eureka12138github.github.io',
+        repoId: 'R_kgDOO5xCQQ',
+        category: 'General',
+        categoryId: 'DIC_kwDOO5xCQc4CucQu',
+		lang: 'zh-CN', // 中文评论模块
+      },
       // Replace with your project's social card
       image: 'img/My-temp-social-card.jpg',
       navbar: {
