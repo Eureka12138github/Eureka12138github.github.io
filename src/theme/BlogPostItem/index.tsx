@@ -1,25 +1,23 @@
-// src/theme/DocItem/Layout/index.tsx
 import React from 'react';
-import Layout from '@theme-original/DocItem/Layout';
-import type LayoutType from '@theme/DocItem/Layout';
+import BlogPostItem from '@theme-original/BlogPostItem';
 import type { WrapperProps } from '@docusaurus/types';
 import Comment from '@site/src/components/Comment';
 
-type Props = WrapperProps<typeof LayoutType>;
+type Props = WrapperProps<typeof BlogPostItem>;
 
-export default function LayoutWrapper(props: Props): JSX.Element {
+export default function BlogPostItemWrapper(props: Props): JSX.Element {
   const { children, ...otherProps } = props;
   
   return (
-    <Layout {...otherProps}>
+    <BlogPostItem {...otherProps}>
       {children}
-      <div className="doc-comments-wrapper" style={{ 
+      <div className="blog-post-comments" style={{ 
         marginTop: '2rem',
         paddingTop: '1.5rem',
         borderTop: '1px solid var(--ifm-color-emphasis-300)'
       }}>
         <Comment />
       </div>
-    </Layout>
+    </BlogPostItem>
   );
 }

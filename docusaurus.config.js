@@ -89,6 +89,7 @@ const config = {
         category: 'General',
         categoryId: 'DIC_kwDOO5xCQc4CucQu',
 		lang: 'zh-CN', // 中文评论模块
+		inputPosition: 'top',
       },
       // Replace with your project's social card
       image: 'img/My-temp-social-card.jpg',
