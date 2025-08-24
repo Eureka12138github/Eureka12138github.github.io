@@ -21,6 +21,14 @@ const readline = require('readline').createInterface({
     output: process.stdout
 });
 
+// 日志记录函数
+function logToFile(message, logFile = null) {
+    if (logFile) {
+        const timestamp = new Date().toISOString();
+        fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`);
+    }
+}
+
 // 主函数
 async function main() {
     try {
@@ -87,32 +95,62 @@ async function main() {
                     console.log(`使用前缀: ${actualPrefix}`);
                 }
                 
-                // 确认处理
-                readline.question('确认开始处理吗？(Y/N): ', (confirm) => {
-                    const answer = confirm.toLowerCase().trim();
+                // 询问是否输出日志文件
+                readline.question('是否生成处理日志文件？(Y/N): ', (logChoice) => {
+                    const logEnabled = logChoice.toLowerCase().trim() === 'y' || logChoice.toLowerCase().trim() === 'yes';
+                    let logFile = null;
                     
-                    if (answer === 'y' || answer === 'yes') {
-                        // 记录处理前的文件夹大小
-                        const beforeStats = getDirectoryStats(selectedOption.path);
-                        
-                        // 开始处理
-                        processImages(selectedOption.path, actualPrefix, renameEnabled).then(() => {
-                            // 记录处理后的文件夹大小
-                            const afterStats = getDirectoryStats(selectedOption.path);
-                            
-                            // 显示处理总结
-                            showProcessingSummary(beforeStats, afterStats);
-                            
-                            console.log('=== 处理完成 ===');
-                            readline.close();
-                        }).catch(err => {
-                            console.error('处理过程中出错:', err.message);
-                            readline.close();
-                        });
-                    } else {
-                        console.log('操作已取消');
-                        readline.close();
+                    if (logEnabled) {
+                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                        logFile = path.join(process.cwd(), `image-processing-log-${timestamp}.txt`);
+                        console.log(`日志文件将保存到: ${logFile}`);
+                        logToFile(`开始处理目录: ${selectedOption.path}`, logFile);
                     }
+                    
+                    // 确认处理
+                    readline.question('确认开始处理吗？(Y/N): ', (confirm) => {
+                        const answer = confirm.toLowerCase().trim();
+                        
+                        if (answer === 'y' || answer === 'yes') {
+                            // 记录开始时间
+                            const startTime = Date.now();
+                            
+                            // 记录处理前的文件夹大小
+                            const beforeStats = getDirectoryStats(selectedOption.path);
+                            
+                            // 开始处理
+                            processImages(selectedOption.path, actualPrefix, renameEnabled, logFile).then(() => {
+                                // 记录处理后的文件夹大小
+                                const afterStats = getDirectoryStats(selectedOption.path);
+                                
+                                // 记录结束时间
+                                const endTime = Date.now();
+                                const processingTime = endTime - startTime;
+                                
+                                // 显示处理总结
+                                showProcessingSummary(beforeStats, afterStats, processingTime, logFile);
+                                
+                                if (logFile) {
+                                    logToFile(`处理完成，总耗时: ${formatTime(processingTime)}`, logFile);
+                                }
+                                
+                                console.log('=== 处理完成 ===');
+                                readline.close();
+                            }).catch(err => {
+                                console.error('处理过程中出错:', err.message);
+                                if (logFile) {
+                                    logToFile(`处理出错: ${err.message}`, logFile);
+                                }
+                                readline.close();
+                            });
+                        } else {
+                            console.log('操作已取消');
+                            if (logFile) {
+                                logToFile('操作已取消', logFile);
+                            }
+                            readline.close();
+                        }
+                    });
                 });
             });
         });
@@ -183,23 +221,44 @@ function getDirectoryStats(dirPath) {
 }
 
 // 显示处理总结
-function showProcessingSummary(beforeStats, afterStats) {
+function showProcessingSummary(beforeStats, afterStats, processingTime, logFile = null) {
     console.log('\n=== 处理总结 ===');
+    if (logFile) {
+        logToFile('\n=== 处理总结 ===', logFile);
+    }
+    
     console.log(`处理图片数量: ${beforeStats.imageCount} 张`);
     console.log(`处理前文件夹大小: ${formatFileSize(beforeStats.totalSize)}`);
     console.log(`处理后文件夹大小: ${formatFileSize(afterStats.totalSize)}`);
+    console.log(`处理总耗时: ${formatTime(processingTime)}`);
+    
+    if (logFile) {
+        logToFile(`处理图片数量: ${beforeStats.imageCount} 张`, logFile);
+        logToFile(`处理前文件夹大小: ${formatFileSize(beforeStats.totalSize)}`, logFile);
+        logToFile(`处理后文件夹大小: ${formatFileSize(afterStats.totalSize)}`, logFile);
+        logToFile(`处理总耗时: ${formatTime(processingTime)}`, logFile);
+    }
     
     if (beforeStats.totalSize > 0) {
         const compressionRatio = ((beforeStats.totalSize - afterStats.totalSize) / beforeStats.totalSize * 100);
         console.log(`总体压缩率: ${compressionRatio.toFixed(1)}%`);
+        if (logFile) {
+            logToFile(`总体压缩率: ${compressionRatio.toFixed(1)}%`, logFile);
+        }
         
         // 添加压缩率说明
+        let compressionMessage = '';
         if (compressionRatio < 10) {
-            console.log('提示: 压缩率较低可能是因为图片已经过压缩或图片本身质量较高');
+            compressionMessage = '提示: 压缩率较低可能是因为图片已经过压缩或图片本身质量较高';
         } else if (compressionRatio < 30) {
-            console.log('提示: 压缩率适中，图片质量与文件大小达到了较好平衡');
+            compressionMessage = '提示: 压缩率适中，图片质量与文件大小达到了较好平衡';
         } else {
-            console.log('提示: 压缩效果显著，有效减小了文件大小');
+            compressionMessage = '提示: 压缩效果显著，有效减小了文件大小';
+        }
+        
+        console.log(compressionMessage);
+        if (logFile) {
+            logToFile(compressionMessage, logFile);
         }
     }
 }
@@ -215,10 +274,50 @@ function formatFileSize(bytes) {
     }
 }
 
+// 格式化时间显示
+function formatTime(milliseconds) {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (minutes > 0) {
+        return `${minutes}分${remainingSeconds}秒`;
+    } else {
+        return `${seconds}秒`;
+    }
+}
+
+// 并发处理函数
+async function processWithConcurrency(files, processFunction, concurrency = 4) {
+    const results = [];
+    const executing = [];
+    
+    for (const file of files) {
+        const promise = processFunction(file).then(result => {
+            results.push(result);
+            return result;
+        });
+        
+        executing.push(promise);
+        
+        if (executing.length >= concurrency) {
+            await Promise.race(executing);
+            // 移除已完成的Promise
+            executing.splice(executing.findIndex(p => p === promise), 1);
+        }
+    }
+    
+    await Promise.all(executing);
+    return results;
+}
+
 // 主处理函数
-async function processImages(targetDir, prefix, renameEnabled = true) {
+async function processImages(targetDir, prefix, renameEnabled = true, logFile = null) {
     try {
         console.log(`处理目录: ${targetDir}`);
+        if (logFile) {
+            logToFile(`开始处理目录: ${targetDir}`, logFile);
+        }
         
         // 找到已存在的最大编号（仅在需要重命名时）
         let currentNum = 1;
@@ -242,6 +341,8 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
         
         // 1. 转换非JPG格式的图片
         let convertedCount = 0;
+        const startTimeConvert = Date.now();
+        
         for (const file of files) {
             const ext = path.extname(file).toLowerCase();
             const fullPath = path.join(targetDir, file);
@@ -254,6 +355,7 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 const newFullPath = path.join(targetDir, newName);
                 
                 let conversionSuccess = false;
+                let errorMessage = '';
                 
                 try {
                     execSync(`ffmpeg -i "${fullPath}" -q:v 2 "${newFullPath}" -y`, {
@@ -263,6 +365,7 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 } catch (err) {
                     // ffmpeg 可能因为警告信息返回非零退出码，但我们仍需检查文件是否生成
                     conversionSuccess = fs.existsSync(newFullPath) && fs.statSync(newFullPath).size > 0;
+                    errorMessage = err.message;
                 }
                 
                 // 检查转换结果
@@ -271,11 +374,20 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                         // 转换成功后删除原文件
                         fs.unlinkSync(fullPath);
                         convertedCount++;
+                        if (logFile) {
+                            logToFile(`转换成功: ${file} -> ${newName}`, logFile);
+                        }
                     } catch (deleteErr) {
                         console.error(`文件转换成功但删除原文件失败: ${file}`);
+                        if (logFile) {
+                            logToFile(`文件转换成功但删除原文件失败: ${file} - ${deleteErr.message}`, logFile);
+                        }
                     }
                 } else {
                     console.error(`转换失败: ${file}`);
+                    if (logFile) {
+                        logToFile(`转换失败: ${file} - ${errorMessage}`, logFile);
+                    }
                     // 如果生成了空文件，删除它
                     if (fs.existsSync(newFullPath) && fs.statSync(newFullPath).size === 0) {
                         fs.unlinkSync(newFullPath);
@@ -284,8 +396,14 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
             }
         }
         
+        const endTimeConvert = Date.now();
+        const convertTime = endTimeConvert - startTimeConvert;
+        
         if (convertedCount > 0) {
-            console.log(`转换完成: ${convertedCount} 个文件已转换为JPG格式`);
+            console.log(`转换完成: ${convertedCount} 个文件已转换为JPG格式 (耗时: ${formatTime(convertTime)})`);
+            if (logFile) {
+                logToFile(`转换完成: ${convertedCount} 个文件已转换为JPG格式 (耗时: ${formatTime(convertTime)})`, logFile);
+            }
         }
         
         // 重新读取文件列表（因为可能有新转换的文件）
@@ -295,6 +413,7 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
         let compressedCount = 0;
         let totalCompressionRatio = 0;
         let processedFilesCount = 0;
+        const startTimeCompress = Date.now();
         
         for (const file of updatedFiles) {
             const ext = path.extname(file).toLowerCase();
@@ -343,6 +462,9 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                         quality += 3; // 增加质量值（降低质量）
                         attempts++;
                     } catch (err) {
+                        if (logFile) {
+                            logToFile(`压缩尝试失败 (质量=${quality}): ${file} - ${err.message}`, logFile);
+                        }
                         break;
                     }
                 }
@@ -359,19 +481,31 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                         compressedCount++;
                         totalCompressionRatio += compressionRatio;
                         processedFilesCount++;
+                        if (logFile) {
+                            logToFile(`压缩成功: ${file} (${formatFileSize(originalFileSize)} -> ${formatFileSize(bestFileSize)}, 压缩率: ${compressionRatio.toFixed(1)}%)`, logFile);
+                        }
                     }
                 } else {
                     // 没有明显压缩效果
                     if (fs.existsSync(tempFile)) {
                         fs.unlinkSync(tempFile);
                     }
+                    if (logFile) {
+                        logToFile(`跳过压缩: ${file} (无法有效压缩)`, logFile);
+                    }
                 }
             }
         }
         
+        const endTimeCompress = Date.now();
+        const compressTime = endTimeCompress - startTimeCompress;
+        
         if (compressedCount > 0) {
             const avgCompressionRatio = totalCompressionRatio / processedFilesCount;
-            console.log(`压缩完成: ${compressedCount} 个文件被压缩，平均压缩率: ${avgCompressionRatio.toFixed(1)}%`);
+            console.log(`压缩完成: ${compressedCount} 个文件被压缩，平均压缩率: ${avgCompressionRatio.toFixed(1)}% (耗时: ${formatTime(compressTime)})`);
+            if (logFile) {
+                logToFile(`压缩完成: ${compressedCount} 个文件被压缩，平均压缩率: ${avgCompressionRatio.toFixed(1)}% (耗时: ${formatTime(compressTime)})`, logFile);
+            }
         }
         
         // 3. 重命名所有JPG图片（仅在启用重命名时）
@@ -394,19 +528,35 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                     const newName = `${prefix}${currentNum}${ext}`;
                     const newFullPath = path.join(targetDir, newName);
                     
-                    fs.renameSync(fullPath, newFullPath);
-                    currentNum++;
-                    renamedCount++;
+                    try {
+                        fs.renameSync(fullPath, newFullPath);
+                        currentNum++;
+                        renamedCount++;
+                        if (logFile) {
+                            logToFile(`重命名: ${file} -> ${newName}`, logFile);
+                        }
+                    } catch (renameErr) {
+                        console.error(`重命名失败: ${file} -> ${newName}`);
+                        if (logFile) {
+                            logToFile(`重命名失败: ${file} -> ${newName} - ${renameErr.message}`, logFile);
+                        }
+                    }
                 }
             }
             
             if (renamedCount > 0) {
                 console.log(`重命名完成: ${renamedCount} 个文件已重命名`);
+                if (logFile) {
+                    logToFile(`重命名完成: ${renamedCount} 个文件已重命名`, logFile);
+                }
             }
         }
         
     } catch (error) {
-        throw new Error(error.message);
+        if (logFile) {
+            logToFile(`处理过程中发生错误: ${error.message}`, logFile);
+        }
+        throw new Error(`处理图片时出错: ${error.message}`);
     }
 }
 
