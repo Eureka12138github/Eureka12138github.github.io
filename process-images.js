@@ -74,42 +74,51 @@ async function main() {
             const selectedOption = options[selectedIndex];
             console.log(`\n即将处理: ${selectedOption.name}`);
             
-            // 确认处理
-            readline.question('确认继续吗？(Y/N): ', (confirm) => {
-                const answer = confirm.toLowerCase().trim();
+            // 获取前缀
+            readline.question('请输入图片前缀名称 (例如 Blog)，直接回车表示只压缩不重命名: ', (prefix) => {
+                let renameEnabled = true;
+                let actualPrefix = prefix;
                 
-                if (answer === 'y' || answer === 'yes') {
-                    // 获取前缀
-                    readline.question('请输入图片前缀名称 (例如 Blog)，直接回车表示只压缩不重命名: ', (prefix) => {
-                        let renameEnabled = true;
-                        let actualPrefix = prefix;
-                        
-                        if (!prefix) {
-                            renameEnabled = false;
-                            actualPrefix = 'temp'; // 临时前缀，不会实际使用
-                            console.log('只进行图片压缩，不重命名文件');
-                        } else {
-                            console.log(`使用前缀: ${actualPrefix}`);
-                        }
+                if (!prefix) {
+                    renameEnabled = false;
+                    actualPrefix = 'temp'; // 临时前缀，不会实际使用
+                    console.log('只进行图片压缩，不重命名文件');
+                } else {
+                    console.log(`使用前缀: ${actualPrefix}`);
+                }
+                
+                // 确认处理
+                readline.question('确认开始处理吗？(Y/N): ', (confirm) => {
+                    const answer = confirm.toLowerCase().trim();
+                    
+                    if (answer === 'y' || answer === 'yes') {
+                        // 记录处理前的文件夹大小
+                        const beforeStats = getDirectoryStats(selectedOption.path);
                         
                         // 开始处理
                         processImages(selectedOption.path, actualPrefix, renameEnabled).then(() => {
+                            // 记录处理后的文件夹大小
+                            const afterStats = getDirectoryStats(selectedOption.path);
+                            
+                            // 显示处理总结
+                            showProcessingSummary(beforeStats, afterStats);
+                            
                             console.log('=== 处理完成 ===');
                             readline.close();
                         }).catch(err => {
-                            console.error('处理过程中出错:', err);
+                            console.error('处理过程中出错:', err.message);
                             readline.close();
                         });
-                    });
-                } else {
-                    console.log('操作已取消');
-                    readline.close();
-                }
+                    } else {
+                        console.log('操作已取消');
+                        readline.close();
+                    }
+                });
             });
         });
         
     } catch (error) {
-        console.error('脚本执行出错:', error);
+        console.error('脚本执行出错:', error.message);
         readline.close();
     }
 }
@@ -122,7 +131,6 @@ function getSubDirectories(dirPath) {
             return fs.statSync(fullPath).isDirectory();
         });
     } catch (error) {
-        console.error('读取目录失败:', error);
         return [];
     }
 }
@@ -144,17 +152,66 @@ function getImageFiles(dirPath) {
     }
 }
 
-// 估算JPEG质量等级（简单估算）
-function estimateJpegQuality(filePath) {
+// 获取目录统计信息
+function getDirectoryStats(dirPath) {
     try {
-        const fileSize = fs.statSync(filePath).size;
+        const files = fs.readdirSync(dirPath);
+        let totalSize = 0;
+        let imageCount = 0;
         
-        // 基于文件大小的粗略质量估算（假设1920x1080图片）
-        if (fileSize > 500000) return 'high';     // > 500KB 高质量
-        if (fileSize > 100000) return 'medium';   // 100-500KB 中等质量
-        return 'low';                             // < 100KB 低质量
+        files.forEach(file => {
+            const fullPath = path.join(dirPath, file);
+            if (fs.statSync(fullPath).isFile()) {
+                const ext = path.extname(file).toLowerCase();
+                if (['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'].includes(ext)) {
+                    totalSize += fs.statSync(fullPath).size;
+                    imageCount++;
+                }
+            }
+        });
+        
+        return {
+            totalSize: totalSize,
+            imageCount: imageCount
+        };
     } catch (error) {
-        return 'unknown';
+        return {
+            totalSize: 0,
+            imageCount: 0
+        };
+    }
+}
+
+// 显示处理总结
+function showProcessingSummary(beforeStats, afterStats) {
+    console.log('\n=== 处理总结 ===');
+    console.log(`处理图片数量: ${beforeStats.imageCount} 张`);
+    console.log(`处理前文件夹大小: ${formatFileSize(beforeStats.totalSize)}`);
+    console.log(`处理后文件夹大小: ${formatFileSize(afterStats.totalSize)}`);
+    
+    if (beforeStats.totalSize > 0) {
+        const compressionRatio = ((beforeStats.totalSize - afterStats.totalSize) / beforeStats.totalSize * 100);
+        console.log(`总体压缩率: ${compressionRatio.toFixed(1)}%`);
+        
+        // 添加压缩率说明
+        if (compressionRatio < 10) {
+            console.log('提示: 压缩率较低可能是因为图片已经过压缩或图片本身质量较高');
+        } else if (compressionRatio < 30) {
+            console.log('提示: 压缩率适中，图片质量与文件大小达到了较好平衡');
+        } else {
+            console.log('提示: 压缩效果显著，有效减小了文件大小');
+        }
+    }
+}
+
+// 格式化文件大小显示
+function formatFileSize(bytes) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    } else if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    } else {
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
 }
 
@@ -178,14 +235,13 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 }
             });
             currentNum = maxNum + 1;
-            console.log(`从编号 ${currentNum} 开始`);
         }
         
         // 获取所有文件
         const files = fs.readdirSync(targetDir);
         
         // 1. 转换非JPG格式的图片
-        console.log('=== 正在转换非JPG格式图片 ===');
+        let convertedCount = 0;
         for (const file of files) {
             const ext = path.extname(file).toLowerCase();
             const fullPath = path.join(targetDir, file);
@@ -197,13 +253,11 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 const newName = path.basename(file, ext) + '.jpg';
                 const newFullPath = path.join(targetDir, newName);
                 
-                console.log(`转换: ${file} -> ${newName}`);
-                
                 let conversionSuccess = false;
                 
                 try {
                     execSync(`ffmpeg -i "${fullPath}" -q:v 2 "${newFullPath}" -y`, {
-                        stdio: 'pipe'
+                        stdio: ['pipe', 'pipe', 'pipe'] // 捕获所有输出但不显示
                     });
                     conversionSuccess = true;
                 } catch (err) {
@@ -216,13 +270,12 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                     try {
                         // 转换成功后删除原文件
                         fs.unlinkSync(fullPath);
-                        console.log(`转换成功: ${file} -> ${newName}`);
-                        console.log(`已删除原文件: ${file}`);
+                        convertedCount++;
                     } catch (deleteErr) {
-                        console.error(`文件转换成功但删除原文件失败: ${file}`, deleteErr.message);
+                        console.error(`文件转换成功但删除原文件失败: ${file}`);
                     }
                 } else {
-                    console.error(`转换失败: ${file} (目标文件未生成或为空)`);
+                    console.error(`转换失败: ${file}`);
                     // 如果生成了空文件，删除它
                     if (fs.existsSync(newFullPath) && fs.statSync(newFullPath).size === 0) {
                         fs.unlinkSync(newFullPath);
@@ -231,11 +284,18 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
             }
         }
         
+        if (convertedCount > 0) {
+            console.log(`转换完成: ${convertedCount} 个文件已转换为JPG格式`);
+        }
+        
         // 重新读取文件列表（因为可能有新转换的文件）
         const updatedFiles = fs.readdirSync(targetDir);
         
         // 2. 尽可能压缩图片
-        console.log('=== 正在尽可能压缩图片 ===');
+        let compressedCount = 0;
+        let totalCompressionRatio = 0;
+        let processedFilesCount = 0;
+        
         for (const file of updatedFiles) {
             const ext = path.extname(file).toLowerCase();
             const fullPath = path.join(targetDir, file);
@@ -246,7 +306,6 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
             // 跳过已经按命名规则命名的文件（避免重复处理）
             const isAlreadyNamed = new RegExp(`^${prefix}\\d+\\.(jpg|jpeg)$`, 'i').test(file);
             if (isAlreadyNamed && renameEnabled) {
-                console.log(`跳过已处理文件: ${file}`);
                 continue;
             }
             
@@ -255,12 +314,8 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 
                 // 对于已经很小的文件，跳过压缩
                 if (originalFileSize < 10240) { // < 10KB
-                    console.log(`跳过压缩: ${file} (文件已很小: ${Math.round(originalFileSize/1024)} KB)`);
                     continue;
                 }
-                
-                const qualityEstimate = estimateJpegQuality(fullPath);
-                console.log(`压缩: ${file} (原大小: ${Math.round(originalFileSize/1024)} KB, 质量评估: ${qualityEstimate})`);
                 
                 // 尽可能压缩图片 - 从较高质量开始逐步降低
                 let quality = 20; // 起始质量
@@ -274,7 +329,7 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 while (quality <= 31 && attempts < maxAttempts) {
                     try {
                         execSync(`ffmpeg -i "${fullPath}" -q:v ${quality} "${tempFile}" -y`, {
-                            stdio: 'ignore'
+                            stdio: ['pipe', 'pipe', 'pipe'] // 捕获所有输出但不显示
                         });
                         
                         const tempFileSize = fs.statSync(tempFile).size;
@@ -288,7 +343,6 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                         quality += 3; // 增加质量值（降低质量）
                         attempts++;
                     } catch (err) {
-                        console.error(`压缩尝试失败 (质量=${quality}): ${file}`, err.message);
                         break;
                     }
                 }
@@ -302,21 +356,27 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                     // 应用最佳压缩结果
                     if (fs.existsSync(tempFile)) {
                         fs.renameSync(tempFile, fullPath);
-                        console.log(`压缩完成: ${file} (原大小: ${Math.round(originalFileSize/1024)} KB -> 压缩后大小: ${Math.round(bestFileSize/1024)} KB, 压缩率: ${compressionRatio.toFixed(1)}%)`);
+                        compressedCount++;
+                        totalCompressionRatio += compressionRatio;
+                        processedFilesCount++;
                     }
                 } else {
                     // 没有明显压缩效果
                     if (fs.existsSync(tempFile)) {
                         fs.unlinkSync(tempFile);
                     }
-                    console.log(`压缩完成: ${file} (原大小: ${Math.round(originalFileSize/1024)} KB -> 无法进一步压缩)`);
                 }
             }
         }
         
+        if (compressedCount > 0) {
+            const avgCompressionRatio = totalCompressionRatio / processedFilesCount;
+            console.log(`压缩完成: ${compressedCount} 个文件被压缩，平均压缩率: ${avgCompressionRatio.toFixed(1)}%`);
+        }
+        
         // 3. 重命名所有JPG图片（仅在启用重命名时）
         if (renameEnabled) {
-            console.log('=== 正在重命名图片 ===');
+            let renamedCount = 0;
             const jpgFiles = fs.readdirSync(targetDir).filter(file => {
                 const ext = path.extname(file).toLowerCase();
                 const fullPath = path.join(targetDir, file);
@@ -330,23 +390,23 @@ async function processImages(targetDir, prefix, renameEnabled = true) {
                 // 检查是否已经符合命名规则
                 const isAlreadyNamed = new RegExp(`^${prefix}\\d+\\.(jpg|jpeg)$`, 'i').test(file);
                 
-                if (isAlreadyNamed) {
-                    console.log(`跳过已命名文件: ${file}`);
-                } else {
+                if (!isAlreadyNamed) {
                     const newName = `${prefix}${currentNum}${ext}`;
                     const newFullPath = path.join(targetDir, newName);
                     
                     fs.renameSync(fullPath, newFullPath);
-                    console.log(`重命名: ${file} -> ${newName}`);
                     currentNum++;
+                    renamedCount++;
                 }
             }
-        } else {
-            console.log('=== 跳过重命名步骤 ===');
+            
+            if (renamedCount > 0) {
+                console.log(`重命名完成: ${renamedCount} 个文件已重命名`);
+            }
         }
         
     } catch (error) {
-        throw new Error(`处理图片时出错: ${error.message}`);
+        throw new Error(error.message);
     }
 }
 
