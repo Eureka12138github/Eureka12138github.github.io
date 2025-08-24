@@ -21,10 +21,34 @@ const readline = require('readline').createInterface({
     output: process.stdout
 });
 
+// 获取本地时间格式
+function getLocalTimestamp() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+// 获取本地时间戳用于文件名（避免特殊字符）
+function getLocalTimestampForFilename() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+}
+
 // 日志记录函数
 function logToFile(message, logFile = null) {
     if (logFile) {
-        const timestamp = new Date().toISOString();
+        const timestamp = getLocalTimestamp();
         fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`);
     }
 }
@@ -95,62 +119,110 @@ async function main() {
                     console.log(`使用前缀: ${actualPrefix}`);
                 }
                 
-                // 询问是否输出日志文件
+                // 询问日志文件位置
                 readline.question('是否生成处理日志文件？(Y/N): ', (logChoice) => {
                     const logEnabled = logChoice.toLowerCase().trim() === 'y' || logChoice.toLowerCase().trim() === 'yes';
                     let logFile = null;
                     
                     if (logEnabled) {
-                        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                        logFile = path.join(process.cwd(), `image-processing-log-${timestamp}.txt`);
-                        console.log(`日志文件将保存到: ${logFile}`);
-                        logToFile(`开始处理目录: ${selectedOption.path}`, logFile);
-                    }
-                    
-                    // 确认处理
-                    readline.question('确认开始处理吗？(Y/N): ', (confirm) => {
-                        const answer = confirm.toLowerCase().trim();
-                        
-                        if (answer === 'y' || answer === 'yes') {
-                            // 记录开始时间
-                            const startTime = Date.now();
-                            
-                            // 记录处理前的文件夹大小
-                            const beforeStats = getDirectoryStats(selectedOption.path);
-                            
-                            // 开始处理
-                            processImages(selectedOption.path, actualPrefix, renameEnabled, logFile).then(() => {
-                                // 记录处理后的文件夹大小
-                                const afterStats = getDirectoryStats(selectedOption.path);
-                                
-                                // 记录结束时间
-                                const endTime = Date.now();
-                                const processingTime = endTime - startTime;
-                                
-                                // 显示处理总结
-                                showProcessingSummary(beforeStats, afterStats, processingTime, logFile);
-                                
-                                if (logFile) {
-                                    logToFile(`处理完成，总耗时: ${formatTime(processingTime)}`, logFile);
-                                }
-                                
-                                console.log('=== 处理完成 ===');
-                                readline.close();
-                            }).catch(err => {
-                                console.error('处理过程中出错:', err.message);
-                                if (logFile) {
-                                    logToFile(`处理出错: ${err.message}`, logFile);
-                                }
-                                readline.close();
-                            });
-                        } else {
-                            console.log('操作已取消');
-                            if (logFile) {
-                                logToFile('操作已取消', logFile);
+                        readline.question('请输入日志文件保存路径（直接回车使用默认路径 logs/）: ', (logPath) => {
+                            let logDir = logPath.trim();
+                            if (!logDir) {
+                                logDir = path.join(process.cwd(), 'logs');
                             }
-                            readline.close();
-                        }
-                    });
+                            
+                            // 确保日志目录存在
+                            if (!fs.existsSync(logDir)) {
+                                fs.mkdirSync(logDir, { recursive: true });
+                            }
+                            
+                            // 使用本地时间生成文件名
+                            const timestamp = getLocalTimestampForFilename();
+                            logFile = path.join(logDir, `image-processing-${timestamp}.log`);
+                            console.log(`日志文件将保存到: ${logFile}`);
+                            logToFile(`开始处理目录: ${selectedOption.path}`, logFile);
+                            
+                            // 确认处理
+                            readline.question('确认开始处理吗？(Y/N): ', (confirm) => {
+                                const answer = confirm.toLowerCase().trim();
+                                
+                                if (answer === 'y' || answer === 'yes') {
+                                    // 记录开始时间
+                                    const startTime = Date.now();
+                                    
+                                    // 记录处理前的文件夹大小
+                                    const beforeStats = getDirectoryStats(selectedOption.path);
+                                    
+                                    // 开始处理
+                                    processImages(selectedOption.path, actualPrefix, renameEnabled, logFile).then(() => {
+                                        // 记录处理后的文件夹大小
+                                        const afterStats = getDirectoryStats(selectedOption.path);
+                                        
+                                        // 记录结束时间
+                                        const endTime = Date.now();
+                                        const processingTime = endTime - startTime;
+                                        
+                                        // 显示处理总结
+                                        showProcessingSummary(beforeStats, afterStats, processingTime, logFile);
+                                        
+                                        if (logFile) {
+                                            logToFile(`处理完成，总耗时: ${formatTime(processingTime)}`, logFile);
+                                        }
+                                        
+                                        console.log('=== 处理完成 ===');
+                                        readline.close();
+                                    }).catch(err => {
+                                        console.error('处理过程中出错:', err.message);
+                                        if (logFile) {
+                                            logToFile(`处理出错: ${err.message}`, logFile);
+                                        }
+                                        readline.close();
+                                    });
+                                } else {
+                                    console.log('操作已取消');
+                                    if (logFile) {
+                                        logToFile('操作已取消', logFile);
+                                    }
+                                    readline.close();
+                                }
+                            });
+                        });
+                    } else {
+                        // 不生成日志文件，直接确认处理
+                        readline.question('确认开始处理吗？(Y/N): ', (confirm) => {
+                            const answer = confirm.toLowerCase().trim();
+                            
+                            if (answer === 'y' || answer === 'yes') {
+                                // 记录开始时间
+                                const startTime = Date.now();
+                                
+                                // 记录处理前的文件夹大小
+                                const beforeStats = getDirectoryStats(selectedOption.path);
+                                
+                                // 开始处理
+                                processImages(selectedOption.path, actualPrefix, renameEnabled, null).then(() => {
+                                    // 记录处理后的文件夹大小
+                                    const afterStats = getDirectoryStats(selectedOption.path);
+                                    
+                                    // 记录结束时间
+                                    const endTime = Date.now();
+                                    const processingTime = endTime - startTime;
+                                    
+                                    // 显示处理总结
+                                    showProcessingSummary(beforeStats, afterStats, processingTime, null);
+                                    
+                                    console.log('=== 处理完成 ===');
+                                    readline.close();
+                                }).catch(err => {
+                                    console.error('处理过程中出错:', err.message);
+                                    readline.close();
+                                });
+                            } else {
+                                console.log('操作已取消');
+                                readline.close();
+                            }
+                        });
+                    }
                 });
             });
         });
@@ -285,30 +357,6 @@ function formatTime(milliseconds) {
     } else {
         return `${seconds}秒`;
     }
-}
-
-// 并发处理函数
-async function processWithConcurrency(files, processFunction, concurrency = 4) {
-    const results = [];
-    const executing = [];
-    
-    for (const file of files) {
-        const promise = processFunction(file).then(result => {
-            results.push(result);
-            return result;
-        });
-        
-        executing.push(promise);
-        
-        if (executing.length >= concurrency) {
-            await Promise.race(executing);
-            // 移除已完成的Promise
-            executing.splice(executing.findIndex(p => p === promise), 1);
-        }
-    }
-    
-    await Promise.all(executing);
-    return results;
 }
 
 // 主处理函数
