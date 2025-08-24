@@ -4,6 +4,9 @@
 # Production
 /build
 
+# Runlogs
+/logs
+
 # Generated files
 .docusaurus
 .cache-loader
