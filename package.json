@@ -13,7 +13,8 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
 	"deploy-site": "node scripts/deploy-site.js site1",
-	"process-img": "node scripts/process-images.js"
+	"process-img": "node scripts/process-images.js",
+	"switch-ssh": "node ./scripts/ssh-config-manager.js switch site1"
   },
   "dependencies": {
     "@docusaurus/core": "3.8.1",

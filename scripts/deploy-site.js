@@ -123,8 +123,7 @@ function proceedWithDeployment(site) {
     console.log(`\n🎉 ${site} 部署成功完成!`);
     console.log(`💡 提示: 当前 SSH 配置已更改为 ${site} 使用的密钥`);
     console.log(`   相关命令:`);
-    console.log(`   node ./scripts/ssh-config-manager.js switch site1  # 切换到 site1`);
-    console.log(`   node ./scripts/ssh-config-manager.js switch site2  # 切换到 site2`);
+    console.log(`   项目根目录：yarn switch-ssh  # 切换到项目对应的ssh秘钥`);
     console.log(`   site1: https://eureka12138github.github.io/`);
     console.log(`   site2: https://eurekashadow.github.io/`);
   } catch (error) {
