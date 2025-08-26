@@ -12,15 +12,17 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-	"deploy-site": "node scripts/deploy-site.js site1",
-	"process-img": "node scripts/process-images.js",
-	"switch-ssh": "node ./scripts/ssh-config-manager.js switch site1"
+    "deploy-site": "node scripts/deploy-site.js site1",
+    "process-img": "node scripts/process-images.js",
+    "switch-ssh": "node ./scripts/ssh-config-manager.js switch site1"
   },
   "dependencies": {
     "@docusaurus/core": "3.8.1",
     "@docusaurus/preset-classic": "3.8.1",
     "@giscus/react": "^3.1.0",
     "@mdx-js/react": "^3.0.0",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "clsx": "^2.0.0",
     "path-browserify": "^1.0.1",
     "prism-react-renderer": "^2.3.0",
