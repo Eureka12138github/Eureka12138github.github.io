@@ -1,21 +1,27 @@
 name: DocSearch Scraper
 
+# 定义工作流触发条件
 on:
+  # 允许手动触发工作流
   workflow_dispatch:
+  # 每天午夜自动运行 (UTC时间)
   schedule:
     - cron: '0 0 * * *'
-  pages_build:
-    types: [completed]
 
+# 定义工作流任务
 jobs:
   algolia:
+    # 运行环境
     runs-on: ubuntu-latest
     steps:
+      # 检出代码仓库
       - uses: actions/checkout@v3
 
+      # 安装 jq 工具用于处理 JSON
       - name: Install jq
         run: sudo apt-get install jq
 
+      # 验证配置文件是否存在
       - name: Validate docsearch.json exists
         run: |
           if [ ! -f "docsearch.json" ]; then
@@ -23,12 +29,15 @@ jobs:
             exit 1
           fi
 
+      # 读取并设置 Algolia 配置
       - name: Get the content of docsearch.json as config
         id: algolia_config
         run: echo "config=$(cat docsearch.json | jq -r tostring)" >> $GITHUB_OUTPUT
 
+      # 运行 DocSearch 爬虫
       - name: Run algolia/docsearch-scraper image
         env:
+          # 从 secrets 获取 Algolia 凭据
           ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
           ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
           CONFIG: ${{ steps.algolia_config.outputs.config }}
