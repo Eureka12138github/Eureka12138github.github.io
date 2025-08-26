@@ -2,11 +2,11 @@
     "rewrites": [
       {
         "source": "/:locale/docs/:path*",
-        "destination": "/:locale/docs/:path*"
+        "destination": "/:locale/index.html"
       },
       {
         "source": "/:locale/blog/:path*",
-        "destination": "/:locale/blog/:path*"
+        "destination": "/:locale/index.html"
       },
       {
         "source": "/:locale/(.*)",
@@ -14,11 +14,11 @@
       },
       {
         "source": "/docs/:path*",
-        "destination": "/docs/:path*"
+        "destination": "/index.html"
       },
       {
         "source": "/blog/:path*",
-        "destination": "/blog/:path*"
+        "destination": "/index.html"
       },
       {
         "source": "/(.*)",
