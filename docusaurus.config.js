@@ -20,7 +20,7 @@ const config = {
   },
 
   // Set the production url of your site here
-  url: 'https://eurekax.space/',
+  url: 'https://eureka12138github.github.io/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -88,7 +88,7 @@ const config = {
 		appId: '7Z8F108UT0',
 		//  Search-Only API Key
 		apiKey: '51c5befc0dffa0fbf8e0066c16535280',
-		indexName: 'Eureka-X-Space',
+		indexName: 'GitPages-Index',
 		searchPagePath: 'search',
 		contextualSearch: true
       },		
