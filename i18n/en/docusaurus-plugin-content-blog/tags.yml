@@ -1,0 +1,69 @@
+facebook:
+  label: Facebook
+  permalink: /facebook
+  description: Facebook tag description
+
+hello:
+  label: Hello
+  permalink: /hello
+  description: Hello tag description
+
+docusaurus:
+  label: Docusaurus
+  permalink: /docusaurus
+  description: Docusaurus tag description
+
+hola:
+  label: Hola
+  permalink: /hola
+  description: Hola tag description
+  
+greetings:
+  label: Greetings
+  permalink: /greetings
+  description: greetings tag description
+  
+recording:
+  label: Recording
+  permalink: /recording
+  description: 在Recording标签下的博客主要为学习记录 
+  
+数组:
+  label: 数组
+  permalink: /数组
+  description: 关于数组的题目 
+
+Git:
+  label: Git
+  permalink: /Git
+  description: 记录学习Git的历程 
+  
+English:
+  label: English
+  permalink: /English
+  description: 记录学习English的过程中遇到的让人迷惑的表达方式  
+
+算法:
+  label: 算法
+  permalink: /算法
+  description: 算法总结
+  
+双指针:
+  label: 双指针
+  permalink: /双指针
+  description: 双指针题目  
+  
+字符串:
+  label: 字符串
+  permalink: /字符串
+  description: 字符串题目   
+  
+ffmpeg:
+  label: ffmpeg
+  permalink: /ffmpeg
+  description: 关于 ffmpeg 的一些记录   
+  
+贪心:
+  label: 贪心
+  permalink: /贪心
+  description: 贪心算法题目 

@@ -39,7 +39,7 @@ const config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'zh-Hans',
-    locales: ['zh-Hans'],
+    locales: ['zh-Hans', 'en'],
   },
 
   presets: [
@@ -118,6 +118,10 @@ const config = {
             label: '记录',
           },
           {to: '/blog', label: '博客', position: 'left'},
+          {
+            type: 'localeDropdown',
+            position: 'right',
+          },
           {
             href: 'https://github.com/Eureka12138github/Eureka12138github.github.io/tree/main',
             label: 'GitHub',
