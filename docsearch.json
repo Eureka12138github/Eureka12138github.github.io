@@ -1,7 +1,7 @@
 {
-  "index_name": "test-site",
-  "start_urls": ["https://eureka12138github.github.io/"],
-  "sitemap_urls": ["https://eureka12138github.github.io/sitemap.xml"],
+  "index_name": "Eureka-X-Space",
+  "start_urls": ["https://eurekax.space/"],
+  "sitemap_urls": ["https://eurekax.space/sitemap.xml"],
   "js_render": true,
   "js_wait": 1,
   "selectors": {
