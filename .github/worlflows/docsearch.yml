@@ -1,0 +1,42 @@
+name: DocSearch Scraper
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+  deployment:
+    types: [completed]
+
+jobs:
+  algolia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Validate docsearch.json exists
+        run: |
+          if [ ! -f "docsearch.json" ]; then
+            echo "docsearch.json not found!"
+            exit 1
+          fi
+
+      - name: Get the content of docsearch.json as config
+        id: algolia_config
+        run: echo "config=$(cat docsearch.json | jq -r tostring)" >> $GITHUB_OUTPUT
+
+      - name: Run algolia/docsearch-scraper image
+        env:
+          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+          ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+          CONFIG: ${{ steps.algolia_config.outputs.config }}
+        run: |
+          echo "Starting DocSearch scraper..."
+          docker run \
+            --env APPLICATION_ID=${ALGOLIA_APP_ID} \
+            --env API_KEY=${ALGOLIA_API_KEY} \
+            --env "CONFIG=${CONFIG}" \
+            algolia/docsearch-scraper
+          echo "DocSearch scraper completed successfully."

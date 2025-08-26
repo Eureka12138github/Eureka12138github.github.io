@@ -82,6 +82,17 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+	  //添加Algolia搜索
+	  algolia: {
+		// Application ID
+		appId: '7Z8F108UT0',
+		//  Search-Only API Key
+		apiKey: '51c5befc0dffa0fbf8e0066c16535280',
+		indexName: 'test-site',
+		searchPagePath: 'search',
+		contextualSearch: true
+      },		
+		
 		// 添加 giscus 评论功能
 		giscus: {
         repo: 'eureka12138github/eureka12138github.github.io',
