@@ -1,0 +1,28 @@
+{
+    "rewrites": [
+      {
+        "source": "/:locale/docs/:path*",
+        "destination": "/:locale/docs/:path*"
+      },
+      {
+        "source": "/:locale/blog/:path*",
+        "destination": "/:locale/blog/:path*"
+      },
+      {
+        "source": "/:locale/(.*)",
+        "destination": "/:locale/index.html"
+      },
+      {
+        "source": "/docs/:path*",
+        "destination": "/docs/:path*"
+      },
+      {
+        "source": "/blog/:path*",
+        "destination": "/blog/:path*"
+      },
+      {
+        "source": "/(.*)",
+        "destination": "/index.html"
+      }
+    ]
+  }
