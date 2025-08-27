@@ -1,13 +1,4 @@
 {
-    "builds": [
-      {
-        "src": "package.json",
-        "use": "@vercel/node",
-        "config": {
-          "outputDirectory": "build"
-        }
-      }
-    ],
     "rewrites": [
       {
         "source": "/:locale/docs/:path*",
@@ -15,6 +6,10 @@
       },
       {
         "source": "/:locale/blog/:path*",
+        "destination": "/:locale/index.html"
+      },
+      {
+        "source": "/:locale/page/:page*/",
         "destination": "/:locale/index.html"
       },
       {
@@ -30,11 +25,24 @@
         "destination": "/index.html"
       },
       {
+        "source": "/page/:page*/",
+        "destination": "/index.html"
+      },
+      {
         "source": "/(.*)",
         "destination": "/index.html"
       }
     ],
     "headers": [
+      {
+        "source": "/:locale/assets/(.*)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
       {
         "source": "/assets/(.*)",
         "headers": [
