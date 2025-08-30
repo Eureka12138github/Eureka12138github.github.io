@@ -20,7 +20,7 @@ const config = {
   },
 
   // Set the production url of your site here
-  url: 'https://eurekax.space/',
+  url: 'https://www.eurekashadow.xin/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -88,7 +88,7 @@ const config = {
 		appId: '7Z8F108UT0',
 		//  Search-Only API Key
 		apiKey: '51c5befc0dffa0fbf8e0066c16535280',
-		indexName: 'Eureka-X-Space',
+		indexName: 'test-site',
 		searchPagePath: 'search',
 		contextualSearch: true
       },		
@@ -103,7 +103,7 @@ const config = {
 		inputPosition: 'top',
       },
       // Replace with your project's social card
-      image: 'img/My-temp-social-card.jpg',
+      image: 'static/img/My-temp-social-card.jpg',
       navbar: {
         title: '我的网站',
         logo: {
