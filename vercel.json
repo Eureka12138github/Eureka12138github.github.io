@@ -13,10 +13,6 @@
         "destination": "/:locale/index.html"
       },
       {
-        "source": "/:locale/(.*)",
-        "destination": "/:locale/index.html"
-      },
-      {
         "source": "/docs/:path*",
         "destination": "/index.html"
       },
@@ -26,10 +22,6 @@
       },
       {
         "source": "/page/:page*/",
-        "destination": "/index.html"
-      },
-      {
-        "source": "/(.*)",
         "destination": "/index.html"
       }
     ],
